@@ -18,7 +18,7 @@
     "iron-icons": "PolymerElements/iron-icons#^1.0.0"
   },
   "devDependencies": {
-    "youtube-displayer": "*"
+    
   },
   "license": "MIT",
   "homepage": "https://github.com/trucotecon40/widget.git"
