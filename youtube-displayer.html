@@ -16,9 +16,9 @@
   </template>
 
     <script>
-    var numberMax = 0;
+      var numberMax = 0;
         Polymer({
-            is: 'youtube-displayer',
+            is: 'number-chart',
             properties: {
               total: {
                 type: Number,
@@ -95,7 +95,7 @@
                 //console.log(this.data.hits)
                 var num = this.data.hits.total > 999 ? (this.data.hits.total/1000).toFixed(1) + 'k' : this.data.hits.total;
                 idNum.innerHTML = num;
-    			this.total = num;
+    this.total = num;
                 idBar.style.width = "100%";
               }
             }
