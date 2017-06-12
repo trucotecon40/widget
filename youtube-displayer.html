@@ -16,7 +16,91 @@
   </template>
 
     <script>
-      
+    var numberMax = 0;
+        Polymer({
+            is: 'youtube-displayer',
+            properties: {
+              total: {
+                type: Number,
+                value: 0
+              },
+              stylebg: {
+                type: String,
+                value: 'bg-yellow'
+              },
+              data: {
+                type: Object,
+                observer: '_dataChanged'              
+              },
+              title: {
+                type: String,
+                value: 'Elements selected'
+              },
+              subtitle: {
+                type: String,
+                value: 'Total elements'
+              },
+              icon: {
+                type: String,
+                value: 'delete'
+              },
+              number: {
+                type: Number,
+                value: 0
+              },
+              object: {
+                type: String
+              },
+              aggkey: {
+                type: String,
+                value: 'category'
+              },
+              filters: {
+                type: Array,
+                notify: true,
+                value: function() { return []; }
+              }
+            },
+
+            kFormatter: function(num){
+              return num > 999 ? (num/1000).toFixed(1) + 'k' : num
+            },
+
+            _dataChanged: function() {
+              console.log("data has changed")
+              if(this.data == undefined || this.data.hits == undefined){
+                console.log("No data");
+                return;
+              }
+              numberMax = this.data.hits.total;
+              var idNum = this.$.number;
+              var idBar = this.$.barprogress;
+              var object = this.object;
+              if (object != undefined){
+                var hits = this.data.aggregations[this.aggkey].buckets;
+                var selected = 0;
+                hits.forEach(function(entry) {
+                  if(entry.key == object){
+                    //console.log("el object es: "+object+" el entry.key es: "+entry.key)
+                    selected = entry.doc_count;
+                  }
+                });
+                console.log(selected);
+                idNum.innerHTML = this.kFormatter(selected);
+                progress = 100*selected/numberMax;
+                idBar.style.width = progress+"%";
+                this.total = this.kFormatter(numberMax);
+              }
+              else{
+                //console.log(this.data.hits)
+                var num = this.data.hits.total > 999 ? (this.data.hits.total/1000).toFixed(1) + 'k' : this.data.hits.total;
+                idNum.innerHTML = num;
+    			this.total = num;
+                idBar.style.width = "100%";
+              }
+            }
+
+        });
     </script>
 
 </dom-module>
