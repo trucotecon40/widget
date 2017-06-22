@@ -7,16 +7,27 @@
   
   <body>
     <youtube-displayer
-      data='{}'
-      object="otherObject"
-      stylebg="bg-red"
-      id="demo-chart2"
-      icon="icons:accessibility"
-      title="Custom title"
-      ></youtube-displayer>
-    
+    	videoid='{}'
+    	finaltime='{}'
+      id="youtube-displayer1"
+    ></youtube-displayer>
     <script>
-     
+          var datas =[
+        {"hits": {
+                "videoid": 'vNOllWX-2aE'
+            },
+            "aggregations": {
+                "category": {
+                    "buckets": [
+                        {"key": "myObject", "doc_count": 3000},
+                        {"key": "otherObject", "doc_count": 1000}
+                    ]
+                }
+            }
+        }];
+      var numdata = 0;
+      var yd1 = document.getElementById('youtube-displayer1');
+      yd1.data = datas[0];
     </script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-`<number-chart>` is a web component designed to show the size of results in an elasticSearch index.
+`<youtube-displayer>` is a web component designed to show a youtube video.
 
 ## Usage
 
@@ -6,17 +6,14 @@ This web component accepts the following parameters:
 
 ```html
 
-<number-chart 
-    data="<!-- json with the ElasticSearch results -->"
-    title="<!-- title -->"
-    subtitle="<!-- title for the total number -->"
-    icon="<!-- an iron-icon name -->"
-    stylebg="<!-- customize background-color -->">
-</number-chart>
+<youtube-displayer 
+    videoid='{}'
+    finaltime='{}'>
+</youtube-displayer>
 
 ```
 
-See the `number-chart.html` file for more information.
+See the `youtube-displayer.html` file for more information.
 
 ## Installation
 
@@ -24,7 +21,7 @@ This web component is available in bower.
 
 ```bash
 
-$ bower install number-chart
+$ bower install youtube-displayer
 
 ```
 
