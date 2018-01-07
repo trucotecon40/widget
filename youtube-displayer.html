@@ -8,32 +8,59 @@
   <link rel="import" type="css" href="display.css">
   <template>
   <div class="container">
-    <iframe class="item" src$="https://www.youtube.com/embed/{{videoid}}" frameborder="0" allowfullscreen>
+    <iframe id="player" class="item" src$="https://www.youtube.com/embed/{{videoid}}" frameborder="0" allowfullscreen>
     </iframe>
   </div>
+  <script>
+    var myConfObj = {
+      iframeMouseOver : false
+    }
+    window.addEventListener('blur',function(){
+      if(myConfObj.iframeMouseOver){
+        document.getElementById('youtube-displayer1').changePlay();
+      }
+    });
+
+    document.getElementById('player').addEventListener('mouseover',function(){
+       myConfObj.iframeMouseOver = true;
+    });
+    document.getElementById('player').addEventListener('mouseout',function(){
+        myConfObj.iframeMouseOver = false;
+    });
+  </script>
   </template>
     <script>
       var numberMax = 0;
         Polymer({
             is: 'youtube-displayer',
             properties: {
-              finaltime: {
-                type: Number,
-                observer: '_dataChanged'              
+              playing: {
+                type: String,
+                value: '{{playing}}',
+                notify: true,
+                observer: 'changePlay'             
               },
               videoid: {
                 type: String,
                 value: '{{videoid}}'
               }
             },
-            _dataChanged: function() {
-              console.log("data has changed")
-              if(this.finaltime == undefined){
-                console.log("No data");
-                return;
+            changePlay: function() {
+              if(this.playing==undefined){
+                this.playing="true";
               }
-              this.finaltime = this.$.now;
+              if (! this.updatingName) {
+                this.updatingName = true;
+                console.log(this.playing);
+              if(this.playing=="false"){
+                this.playing = "true";  
+              } else{
+                this.playing = "false";  
+              }            
+                this.updatingName = false;
               }
+
+            }
         });
     </script>
 </dom-module>
