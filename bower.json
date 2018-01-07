@@ -3,7 +3,7 @@
   "authors": [
     "gsi-upm"
   ],
-  "version": "1.1.1",
+  "version": "3.0",
   "description": "This Web component displays a youtube video",
   "main": "youtube-displayer.html",
   "keywords": [
