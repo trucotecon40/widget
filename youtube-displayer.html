@@ -5,19 +5,116 @@
 <link rel="import" href="../iron-icons/social-icons.html">
 
 <dom-module id="youtube-displayer">
+  <style type="text/css">
+    .top-widget {
+    width: 100%;
+    background-color: #1275c2;
+    border-radius: 20px 20px 0 0;
+    color: white;
+    text-align: center;
+    height: 35px;
+    line-height: 35px;
+    font-size: 1.2em;
+}
+.widget-wrapper {
+  border-radius: 20px 20px 0px 0px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+}
+  </style>
   <link rel="import" type="css" href="display.css">
   <template>
+      <div class="widget-wrapper" style="width: 626px;margin: auto;">
+    <div class="top-widget">
+      Youtube displayer
+    </div>
   <div class="container">
+  <input id="videoid_container" type="text" style="display: none;" value$="{{videoid}}">
+  <input id="initialtime" type="text" style="display: none;" value$="{{initialtime}}">
+  <input id="flag" type="text" style="display: none;" value="0">
     <iframe id="player" class="item" src$="https://www.youtube.com/embed/{{videoid}}?start={{initialtime}}" frameborder="0" allowfullscreen>
     </iframe>
+    <div id="playero"></div>
+  </div>
   </div>
   <script>
+
+        // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      console.log(tag);
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      
+      function youtube_ready() {
+        document.getElementById('player').parentNode.removeChild( document.getElementById('player') );
+        var video_id = function(){return document.getElementById('videoid_container').value;}
+        var videoid = video_id();
+        player = new YT.Player('playero', {
+          height: '360',
+          width: '640',
+          videoId: videoid,
+          events: {
+            'onStateChange': onPlayerStateChange,
+            onReady: function() {
+              player.playVideo();
+              var status = player.getPlayerState();
+              console.log(status);
+              document.getElementById("{{id}}").changePlay(status.data);
+            }
+          }
+        });
+
+      }
+      var done = false;
+      function onPlayerStateChange(event) {
+        if(event.data==1) { // playing
+            myTimer = setInterval(function(){ 
+                if(document.getElementById('flag').value==1){
+                  player.seekTo(document.getElementById('initialtime').value);
+                  document.getElementById('flag').value=0;
+                }else{
+                var time;
+                time = player.getCurrentTime();
+                document.getElementById("{{id}}").changeTime(time);
+                }
+            }, 100); // 100 means repeat in 100 ms
+        }
+        else { // not playing
+            clearInterval(myTimer);
+        }
+          document.getElementById("{{id}}").changePlay(event.data);
+      }
+
+      
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        
+      }
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      function stopVideo() {
+        player.stopVideo();
+      }
+      
+
     var myConfObj = {
       iframeMouseOver : false
     }
     window.addEventListener('blur',function(){
       if(myConfObj.iframeMouseOver){
-        document.getElementById('youtube-displayer1').changePlay();
+        if(player==undefined){
+          youtube_ready();
+        }
+        
+              
+        
       }
     });
 
@@ -40,23 +137,47 @@
                 notify: true,
                 observer: 'changePlay'             
               },
+              secs: {
+                type: String,
+                value: '{{secs}}',
+                notify: true,
+                observer: 'changeTime'             
+              },
               videoid: {
                 type: String,
-                value: '{{videoid}}'
+                value: '{{videoid}}',
+                observer: '_dataChanged'
               },
               initialtime: {
                 type: String,
-                value: '{{initialtime}}'
+                value: '{{initialtime}}',
+                observer: 'changeInitialTime'
+              },
+              id: {
+                type: String,
+                value: "{{id}}", 
               }
             },
-            changePlay: function() {
-              if(this.playing==undefined){
-                this.playing="true";
+            _dataChanged: function() {
+              console.log("data has changed")
+              if(this.videoid == undefined){
+                console.log("No new comments");
+                console.log("OH NO");
+                return;
+              }else{
+                console.log(this.videoid);
+                console.log(this.videoid);
+                console.log(this.videoid);
+                console.log(this.videoid);
+                console.log(this.videoid);
+                console.log(this.videoid);
               }
+              
+            },
+            changePlay: function(status) {
               if (! this.updatingName) {
                 this.updatingName = true;
-                console.log(this.playing);
-              if(this.playing=="false"){
+              if(status==1){
                 this.playing = "true";  
               } else{
                 this.playing = "false";  
@@ -64,7 +185,25 @@
                 this.updatingName = false;
               }
 
+            },
+            changeTime: function(time) {
+              if(this.secs.length < 4){
+
+              }else{
+                if (! this.updatingName) {
+                  this.updatingName = true;
+                  this.secs = time;
+                  this.updatingName = false;
+                }
+              }
+            },
+            changeInitialTime: function() {
+              console.log(String(this.initialtime).length);
+              console.log(String(this.initialtime));
+              if(String(this.initialtime)!="{{initialtime}}"){
+              document.getElementById('flag').value=1;
             }
+            }             
         });
     </script>
 </dom-module>
