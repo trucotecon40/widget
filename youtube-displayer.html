@@ -7,44 +7,44 @@
 <dom-module id="youtube-displayer">
   <style type="text/css">
     .top-widget {
-    width: 100%;
-    background-color: #1275c2;
-    border-radius: 20px 20px 0 0;
-    color: white;
-    text-align: center;
-    height: 35px;
-    line-height: 35px;
-    font-size: 1.2em;
-}
-.widget-wrapper {
-  border-radius: 20px 20px 0px 0px;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-}
+      width: 100%;
+      background-color: #1275c2;
+      border-radius: 20px 20px 0 0;
+      color: white;
+      text-align: center;
+      height: 35px;
+      line-height: 35px;
+      font-size: 1.2em;
+    }
+    .widget-wrapper {
+      border-radius: 20px 20px 0px 0px;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+    }
   </style>
   <link rel="import" type="css" href="display.css">
   <template>
-      <div class="widget-wrapper" style="width: 626px;margin: auto;">
-    <div class="top-widget">
-      Youtube displayer
+    <div class="widget-wrapper" style="width: 626px;margin: auto;">
+      <div class="top-widget">
+        Youtube displayer
+      </div>
+      <div class="container">
+        <input id="videoid_container" type="text" style="display: none;" value$="{{videoid}}">
+        <input id="initialtime" type="text" style="display: none;" value$="{{initialtime}}">
+        <input id="flag" type="text" style="display: none;" value="0">
+        <iframe id="player" class="item" src$="https://www.youtube.com/embed/{{videoid}}?start={{initialtime}}" frameborder="0" allowfullscreen>
+        </iframe>
+        <div id="playero"></div>
+      </div>
     </div>
-  <div class="container">
-  <input id="videoid_container" type="text" style="display: none;" value$="{{videoid}}">
-  <input id="initialtime" type="text" style="display: none;" value$="{{initialtime}}">
-  <input id="flag" type="text" style="display: none;" value="0">
-    <iframe id="player" class="item" src$="https://www.youtube.com/embed/{{videoid}}?start={{initialtime}}" frameborder="0" allowfullscreen>
-    </iframe>
-    <div id="playero"></div>
-  </div>
-  </div>
-  <script>
+    <script>
 
         // 2. This code loads the IFrame Player API code asynchronously.
-      var tag = document.createElement('script');
+        var tag = document.createElement('script');
 
-      tag.src = "https://www.youtube.com/iframe_api";
-      console.log(tag);
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        tag.src = "https://www.youtube.com/iframe_api";
+
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
       // 3. This function creates an <iframe> (and YouTube player)
       //    after the API code downloads.
@@ -63,7 +63,7 @@
             onReady: function() {
               player.playVideo();
               var status = player.getPlayerState();
-              console.log(status);
+
               document.getElementById("{{id}}").changePlay(status.data);
             }
           }
@@ -73,21 +73,21 @@
       var done = false;
       function onPlayerStateChange(event) {
         if(event.data==1) { // playing
-            myTimer = setInterval(function(){ 
-                if(document.getElementById('flag').value==1){
-                  player.seekTo(document.getElementById('initialtime').value);
-                  document.getElementById('flag').value=0;
-                }else{
-                var time;
-                time = player.getCurrentTime();
-                document.getElementById("{{id}}").changeTime(time);
-                }
+          myTimer = setInterval(function(){ 
+            if(document.getElementById('flag').value==1){
+              player.seekTo(document.getElementById('initialtime').value);
+              document.getElementById('flag').value=0;
+            }else{
+              var time;
+              time = player.getCurrentTime();
+              document.getElementById("{{id}}").changeTime(time);
+            }
             }, 100); // 100 means repeat in 100 ms
         }
         else { // not playing
-            clearInterval(myTimer);
+          clearInterval(myTimer);
         }
-          document.getElementById("{{id}}").changePlay(event.data);
+        document.getElementById("{{id}}").changePlay(event.data);
       }
 
       
@@ -104,106 +104,96 @@
       }
       
 
-    var myConfObj = {
-      iframeMouseOver : false
-    }
-    window.addEventListener('blur',function(){
-      if(myConfObj.iframeMouseOver){
-        if(player==undefined){
-          youtube_ready();
+      var myConfObj = {
+        iframeMouseOver : false
+      }
+      window.addEventListener('blur',function(){
+        if(myConfObj.iframeMouseOver){
+          if(player==undefined){
+            youtube_ready();
+          }
+          
+          
+          
+        }
+      });
+
+      document.getElementById('player').addEventListener('mouseover',function(){
+       myConfObj.iframeMouseOver = true;
+     });
+      document.getElementById('player').addEventListener('mouseout',function(){
+        myConfObj.iframeMouseOver = false;
+      });
+    </script>
+  </template>
+  <script>
+    var numberMax = 0;
+    Polymer({
+      is: 'youtube-displayer',
+      properties: {
+        playing: {
+          type: String,
+          value: '{{playing}}',
+          notify: true,
+          observer: 'changePlay'             
+        },
+        secs: {
+          type: String,
+          value: '{{secs}}',
+          notify: true,
+          observer: 'changeTime'             
+        },
+        videoid: {
+          type: String,
+          value: '{{videoid}}',
+          observer: '_dataChanged'
+        },
+        initialtime: {
+          type: String,
+          value: '{{initialtime}}',
+          observer: 'changeInitialTime'
+        },
+        id: {
+          type: String,
+          value: "{{id}}", 
+        }
+      },
+      _dataChanged: function() {
+        
+        if(this.videoid == undefined){
+          return;
+        }else{
         }
         
-              
-        
-      }
-    });
+      },
+      changePlay: function(status) {
+        if (! this.updatingName) {
+          this.updatingName = true;
+          if(status==1){
+            this.playing = "true";  
+          } else{
+            this.playing = "false";  
+          }            
+          this.updatingName = false;
+        }
 
-    document.getElementById('player').addEventListener('mouseover',function(){
-       myConfObj.iframeMouseOver = true;
-    });
-    document.getElementById('player').addEventListener('mouseout',function(){
-        myConfObj.iframeMouseOver = false;
+      },
+      changeTime: function(time) {
+        if(this.secs.length < 4){
+
+        }else{
+          if (! this.updatingName) {
+            this.updatingName = true;
+            this.secs = time;
+            this.updatingName = false;
+          }
+        }
+      },
+      changeInitialTime: function() {
+        if(String(this.initialtime)!="{{initialtime}}"){
+          document.getElementById('flag').value=1;
+        }
+      }             
     });
   </script>
-  </template>
-    <script>
-      var numberMax = 0;
-        Polymer({
-            is: 'youtube-displayer',
-            properties: {
-              playing: {
-                type: String,
-                value: '{{playing}}',
-                notify: true,
-                observer: 'changePlay'             
-              },
-              secs: {
-                type: String,
-                value: '{{secs}}',
-                notify: true,
-                observer: 'changeTime'             
-              },
-              videoid: {
-                type: String,
-                value: '{{videoid}}',
-                observer: '_dataChanged'
-              },
-              initialtime: {
-                type: String,
-                value: '{{initialtime}}',
-                observer: 'changeInitialTime'
-              },
-              id: {
-                type: String,
-                value: "{{id}}", 
-              }
-            },
-            _dataChanged: function() {
-              console.log("data has changed")
-              if(this.videoid == undefined){
-                console.log("No new comments");
-                console.log("OH NO");
-                return;
-              }else{
-                console.log(this.videoid);
-                console.log(this.videoid);
-                console.log(this.videoid);
-                console.log(this.videoid);
-                console.log(this.videoid);
-                console.log(this.videoid);
-              }
-              
-            },
-            changePlay: function(status) {
-              if (! this.updatingName) {
-                this.updatingName = true;
-              if(status==1){
-                this.playing = "true";  
-              } else{
-                this.playing = "false";  
-              }            
-                this.updatingName = false;
-              }
-
-            },
-            changeTime: function(time) {
-              if(this.secs.length < 4){
-
-              }else{
-                if (! this.updatingName) {
-                  this.updatingName = true;
-                  this.secs = time;
-                  this.updatingName = false;
-                }
-              }
-            },
-            changeInitialTime: function() {
-              console.log(String(this.initialtime).length);
-              console.log(String(this.initialtime));
-              if(String(this.initialtime)!="{{initialtime}}"){
-              document.getElementById('flag').value=1;
-            }
-            }             
-        });
-    </script>
 </dom-module>
